@@ -77,36 +77,57 @@
       extension.window.startAutoResizer();
     });
 
-    async function publishSelectedLocales(event) {
+    function publishSelectedLocales(event) {
       let extension = event.target.extension
       let localized_fields = extension.contentType.fields.filter(v => v.localized === true).map(v => v.id)
-      console.log(localized_fields)
+      console.log("localized_fields", localized_fields)
       let available_locales = extension.locales.available
       let selected_locales = $(':checked').toArray().map(v => v.value)
       let unselected_locales = available_locales.filter((e) => !selected_locales.includes(e))
-      console.log(available_locales)
-      console.log(selected_locales)
-      console.log(unselected_locales)
-      let backup_content = {}
+      console.log("available_locales", available_locales)
+      console.log("selected_locales", selected_locales)
+      console.log("unselected_locales", unselected_locales)
+      var backup_content = {}
       localized_fields.forEach(field => {
         backup_content[field] = {}
         unselected_locales.forEach(locale => {
           if (extension.entry.fields[field].getValue(locale)) {
+            console.log(`Backing up "${locale}" locale of "${field}" field to "${extension.entry.fields[field].getValue(locale)}" and clearing stored value`)
             backup_content[field][locale] = extension.entry.fields[field].getValue(locale)
             extension.entry.fields[field].setValue('', locale)
+            console.log("field value", `"${extension.entry.fields[field].getValue(locale)}"`)
           }
         })
       })
-      console.log(backup_content)
-      var entry = await extension.space.getEntry(extension.entry.getSys().id)
-      console.log(JSON.stringify(entry, null, 2))
-      extension.space.publishEntry(entry)
+      console.log("backup_content", backup_content)
+      extension.space.getEntry(extension.entry.getSys().id).then(entry1 => {
+        console.log("pre publish entry", entry1.fields.title)
+        extension.space.publishEntry(entry1).then(entry2 => {
+          console.log("post publish entry", entry2.fields.title)
+          localized_fields.forEach(field => {
+            unselected_locales.forEach(locale => {
+              if (backup_content[field][locale]) {
+                console.log(`Setting "${locale}" locale of "${field}" field to "${backup_content[field][locale]}"`)
+                extension.entry.fields[field].setValue(backup_content[field][locale], locale)
+                console.log("field value", `"${extension.entry.fields[field].getValue(locale)}"`)
+              }
+            })
+          })
+          extension.space.getEntry(extension.entry.getSys().id).then(entry3 => {
+            console.log("post restore entry", entry3.fields.title)
+          })
+          $('#locale-publisher-button').text('Done')
+          $(':checked').each((i, el) => {
+            console.log(`unchecking ${el.value} locale box`)
+            el.checked = false
+          })
 
-      localized_fields.forEach(field => {
-        unselected_locales.forEach(locale => {
-          extension.entry.fields[field].setValue(backup_content[field][locale], locale)
+          window.setTimeout(() => {
+            $('#locale-publisher-button').text('Publish')
+          }, 3000)
         })
       })
+
     }
   </script>
 </body>
