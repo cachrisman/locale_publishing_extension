@@ -1,0 +1,7 @@
+{
+  "id": "localePublisher",
+  "name": "Locale Publisher",
+  "srcdoc": "index.html",
+  "fieldTypes": ["Symbol"],
+  "sidebar": true
+}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Locale Publisher</title>
+  <link rel="stylesheet" href="https://unpkg.com/contentful-ui-extensions-sdk@3/dist/cf-extension.css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" />
+  <style>
+    body {
+      font-family: "Avenir Next W01", Helvetica, sans-serif;
+      font-size: 14px;
+      margin: 0;
+      color: #8091a5 !important;
+      overflow: hidden;
+      background-color: #f7f9fa;
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 1em;
+    }
+
+    .button {
+      display: block;
+      position: relative;
+      border-right: none;
+      overflow: hidden;
+      width: 100%;
+      height: 40px;
+      white-space: nowrap;
+      outline: 0;
+      padding: 0.625rem 1.5rem;
+      cursor: pointer;
+      text-align: center;
+      font-weight: 500;
+      border: 1px solid transparent;
+      border-color: #0eb87f;
+      border-radius: 2px;
+      line-height: 18px;
+      color: #fff;
+      background: linear-gradient(to top, #0eb87f, #14d997);
+      background-size: 100% 200%;
+    }
+
+    label {
+      font-weight: normal;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="content"></div>
+  <script id="template" type="x-tmpl-mustache">
+    <p>Please select the locales you wish to publish:</p>
+    {{#locales}}
+    <div>
+      <input type="checkbox" id="{{.}}" name="{{.}}" value="{{.}}">
+      <label for="{{.}}">{{.}}</label>
+    </div>
+    {{/locales}}
+    <div>
+      <button id='locale-publisher-button' class="button cf-block">Publish</button>
+    </div>
+  </script>
+  <script src="https://unpkg.com/contentful-ui-extensions-sdk@3"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
+  <script>
+    window.contentfulExtension.init(function(extension) {
+      window.extension = extension
+      console.log('starting locale publisher');
+      var rendered = Mustache.render(document.getElementById('template').innerHTML, { locales: extension.locales.available });
+      document.getElementById('content').innerHTML = rendered;
+      document.getElementById('locale-publisher-button').addEventListener('click', publishSelectedLocales)
+      document.getElementById('locale-publisher-button').extension = extension
+      extension.window.startAutoResizer();
+    });
+
+    async function publishSelectedLocales(event) {
+      let extension = event.target.extension
+      let localized_fields = extension.contentType.fields.filter(v => v.localized === true).map(v => v.id)
+      console.log(localized_fields)
+      let available_locales = extension.locales.available
+      let selected_locales = $(':checked').toArray().map(v => v.value)
+      let unselected_locales = available_locales.filter((e) => !selected_locales.includes(e))
+      console.log(available_locales)
+      console.log(selected_locales)
+      console.log(unselected_locales)
+      let backup_content = {}
+      localized_fields.forEach(field => {
+        backup_content[field] = {}
+        unselected_locales.forEach(locale => {
+          if (extension.entry.fields[field].getValue(locale)) {
+            backup_content[field][locale] = extension.entry.fields[field].getValue(locale)
+            extension.entry.fields[field].setValue('', locale)
+          }
+        })
+      })
+      console.log(backup_content)
+      var entry = await extension.space.getEntry(extension.entry.getSys().id)
+      console.log(JSON.stringify(entry, null, 2))
+      extension.space.publishEntry(entry)
+
+      localized_fields.forEach(field => {
+        unselected_locales.forEach(locale => {
+          extension.entry.fields[field].setValue(backup_content[field][locale], locale)
+        })
+      })
+    }
+  </script>
+</body>
+
+</html>
