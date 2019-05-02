@@ -4,7 +4,7 @@
 
 [Contentful](https://www.contentful.com) is a content management platform for web applications, mobile apps and connected devices. It allows you to create, edit & manage content in the cloud and publish it anywhere via powerful API. Contentful offers tools for managing editorial teams and enabling cooperation between organizations.
 
-This extension provides a widget which lives in the sidebar of the Contentful webapp and provides a way to select which locales of the current document to publish. The unselected locales are published with empty values. After publishing the values of the unselected locales are restored to their previous values.
+This extension provides a widget which lives in the sidebar of the Contentful webapp and provides a way to select which locales of the current entry to publish. The unselected locales are published with either the previously published value or empty values. After publishing the values of the unselected locales are restored to their previous values.
 
 <img width="333" alt="screenshot" src="https://user-images.githubusercontent.com/6521666/40333977-1326f416-5d10-11e8-83ce-3ee8bd47ec18.png">
 
