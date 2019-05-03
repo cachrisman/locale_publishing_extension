@@ -10,8 +10,6 @@ This extension provides a widget which lives in the sidebar of the Contentful we
 
 ## How to use
 
-### the process described below does not currently support sidebar extensions
-
 1. Copy this link:
 
 ```
@@ -23,8 +21,9 @@ https://github.com/cachrisman/locale_publishing_extension/blob/master/extension.
 4. Select "Install from GitHub"
 5. Paste in the link from above and click install.
 
-### use this process instead
+### Or use this process if you prefer command line tools
 
 1. install the [contentful-cli](https://github.com/contentful/contentful-cli) tool
+2. open a terminal and run `git clone https://github.com/cachrisman/locale_publishing_extension.git; cd locale_publishing_extension`
 2. run `contentful login`
 3. run `contentful extension update --space-id YOUR_SPACE_ID --force`
