@@ -10,20 +10,26 @@ This extension provides a widget which lives in the sidebar of the Contentful we
 
 ## How to use
 
+### Using the Webapp
+
 1. Copy this link:
 
 ```
 https://github.com/cachrisman/locale_publishing_extension/blob/master/extension.json
 ```
 
-2. Go to the [Contentful webapp](https://app.contentful.com/deeplink?link=extensions)
+2. Go to the [Contentful webapp](https://app.contentful.com/deeplink?link=extensions)'s extension settings page
 3. Click the add blue "Add extension" button
 4. Select "Install from GitHub"
 5. Paste in the link from above and click install.
 
-### Or use this process if you prefer command line tools
+### Or using command line tools
 
 1. install the [contentful-cli](https://github.com/contentful/contentful-cli) tool
 2. open a terminal and run `git clone https://github.com/cachrisman/locale_publishing_extension.git; cd locale_publishing_extension`
 2. run `contentful login`
 3. run `contentful extension update --space-id YOUR_SPACE_ID --force`
+
+### Last, add the sidebar extension to be shown for the desired content types
+
+Refer to [this documentation page](https://www.contentful.com/developers/docs/extensibility/custom-sidebar/) on using a custom sidebar for details on how to do this.
